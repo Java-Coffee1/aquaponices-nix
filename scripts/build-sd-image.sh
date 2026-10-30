@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Builds a flashable SD card image for a host defined in this flake.
+# Builds a flashable disk image for a host defined in this flake, as a .iso
+# file.
 #
-# Raspberry Pi boots from an SD card image (.img), not an ISO — there's no
-# optical-media install path on the Pi, so this is the equivalent of "make
-# me an installer" for this hardware.
+# Note: Raspberry Pi firmware boots from a raw SD card image, not an ISO9660
+# filesystem — there's no optical-media boot path on this hardware. This
+# script just renames the raw image to a .iso extension; you still flash it
+# to an SD card with dd exactly like a .img, it will NOT mount as a CD/DVD.
 set -euo pipefail
 
 HOST="${1:-dashboard-nix-btw}"
@@ -11,21 +13,26 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 cd "$REPO_ROOT"
 
-echo "Building SD image for nixosConfigurations.${HOST} ..."
+echo "Building image for nixosConfigurations.${HOST} ..."
 nix build --accept-flake-config -L \
   ".#nixosConfigurations.${HOST}.config.system.build.sdImage"
 
-IMAGE="$(find result/sd-image -maxdepth 1 -name '*.img*' -print -quit)"
+COMPRESSED="$(find result/sd-image -maxdepth 1 -name '*.img.zst' -print -quit)"
 
-if [[ -z "$IMAGE" ]]; then
+if [[ -z "$COMPRESSED" ]]; then
   echo "Build finished but no image was found under result/sd-image/" >&2
   exit 1
 fi
 
+ISO="${REPO_ROOT}/${HOST}.iso"
+echo "Decompressing to ${ISO} ..."
+zstd -dc "$COMPRESSED" > "$ISO"
+
 echo
-echo "Image built: $IMAGE"
+echo "Image built: $ISO"
 echo
-echo "Flash it to an SD card (replace /dev/sdX with your SD card device):"
-echo "  zstd -dc '$IMAGE' | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync"
+echo "This is still a raw disk image despite the .iso extension — flash it to"
+echo "an SD card the same way (replace /dev/sdX with your SD card device):"
+echo "  sudo dd if='$ISO' of=/dev/sdX bs=4M status=progress conv=fsync"
 echo
 echo "Double-check /dev/sdX with 'lsblk' first — dd will silently overwrite the wrong disk."

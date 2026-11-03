@@ -15,21 +15,39 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixos-raspberrypi, hjem, ... }@inputs: {
-    nixosConfigurations.dashboard-nix-btw = nixos-raspberrypi.lib.nixosSystem {
-      specialArgs = inputs;
-      modules = [
+  outputs =
+    {
+      nixos-raspberrypi,
+      hjem,
+      ...
+    }@inputs:
+    let
+      mkHost =
         {
-          imports = with nixos-raspberrypi.nixosModules; [
+          name,
+          modules ? [ ],
+        }:
+        nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = inputs;
+          modules = [
+            ./hosts/${name}
+            hjem.nixosModules.default
+            { networking.hostName = name; }
+          ]
+          ++ modules;
+        };
+    in
+    {
+      nixosConfigurations = {
+        dashboard-nix-btw = mkHost {
+          name = "dashboard-nix-btw";
+          modules = with nixos-raspberrypi.nixosModules; [
             raspberry-pi-5.base
             raspberry-pi-5.display-vc4
             raspberry-pi-5.bluetooth
             sd-image
           ];
-        }
-        hjem.nixosModules.default
-        ./hosts/dashboard-nix-btw/default.nix
-      ];
+        };
+      };
     };
-  };
 }

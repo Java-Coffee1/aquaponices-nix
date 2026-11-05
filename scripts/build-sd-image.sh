@@ -16,7 +16,7 @@ OUT="$OUT_DIR/$HOST.iso"
 
 echo "Building SD image for $HOST ..."
 STORE_PATH="$(nix build "$REPO_ROOT#nixosConfigurations.$HOST.config.system.build.sdImage" \
-  --no-link --print-out-paths)"
+  --accept-flake-config --no-link --print-out-paths)"
 
 IMAGES=("$STORE_PATH"/sd-image/*)
 IMAGE="${IMAGES[0]}"

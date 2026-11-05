@@ -1,6 +1,18 @@
 {
   description = "NixOS configuration for the aquaponics dashboard Raspberry Pi";
 
+  # nixos-raspberrypi publishes prebuilt kernel/firmware/bootloader derivations
+  # here. A flake's nixConfig only applies when that flake is the one being
+  # built directly, not from a dependency, so it has to be repeated here too
+  # -- otherwise everything gets compiled from source (very slow when
+  # cross-building aarch64 under binfmt emulation).
+  nixConfig = {
+    extra-substituters = [ "https://nixos-raspberrypi.cachix.org" ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-26.05";
 

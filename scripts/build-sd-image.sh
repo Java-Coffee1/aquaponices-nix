@@ -31,7 +31,7 @@ HOST="${HOST:-dashboard-nix-btw}"
 OUT_DIR="$PWD"
 OUT="$OUT_DIR/$HOST.iso"
 
-NIX_BUILD_ARGS=(--no-link --print-out-paths)
+NIX_BUILD_ARGS=(--no-link --print-out-paths --print-build-logs)
 if [[ "$FROM_SOURCE" -eq 1 ]]; then
   echo "Building from source -- ignoring the nixos-raspberrypi binary cache."
   NIX_BUILD_ARGS+=(--no-substitute)

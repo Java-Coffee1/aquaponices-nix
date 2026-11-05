@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   imports = [
@@ -8,6 +8,8 @@
   ];
 
   networking.hostName = "dashboard-nix-btw";
+
+  boot.supportedFilesystems.zfs = lib.mkForce false;
 
   time.timeZone = "Etc/UTC"; # TODO: set to your actual timezone
 

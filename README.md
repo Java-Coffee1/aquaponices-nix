@@ -45,6 +45,34 @@ the disk your system is currently running from, but double-check before
 confirming. It asks you to re-type the device path to confirm before it
 writes anything.
 
-Boot the Pi 5 from the flashed card/drive. SSH access for the `aqua` user
-is already baked into the image (see `home/aqua/aqua.nix`), so there's no
-first-boot setup required beyond plugging it in.
+## First boot
+
+Put the card/drive in the Pi 5 and power it on. Use an Ethernet cable --
+there's no Wi-Fi configured in this flake, so it needs a wired connection
+to get an address via DHCP.
+
+There's no mDNS/Avahi configured either, so `dashboard-nix-btw.local`
+won't resolve. Find its IP from your router's DHCP client list, or plug
+in a monitor/keyboard and read it off the console.
+
+```
+ssh aqua@<pi-ip>
+```
+
+The `aqua` user's SSH key is already baked into the image (see
+`home/aqua/aqua.nix`), and password auth / root login are both disabled --
+you'll need the private key matching the public key committed there
+(`java@ghost`). Swap in your own key before building if that's not one
+you hold.
+
+## Making changes after the first install
+
+You don't need to rebuild and reflash an image for every change. Once the
+Pi is up over SSH:
+
+```
+nixos-rebuild switch --flake .#dashboard-nix-btw --target-host aqua@<pi-ip> --use-remote-sudo
+```
+
+run from this repo on your dev machine. Re-flashing is really only for
+the first install or a from-scratch recovery.

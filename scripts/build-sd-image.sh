@@ -7,12 +7,15 @@
 # flash-iso.sh (or dd) exactly like a .img file.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 HOST="${1:-dashboard-nix-btw}"
 OUT_DIR="$PWD"
 OUT="$OUT_DIR/$HOST.iso"
 
 echo "Building SD image for $HOST ..."
-STORE_PATH="$(nix build ".#nixosConfigurations.$HOST.config.system.build.sdImage" \
+STORE_PATH="$(nix build "$REPO_ROOT#nixosConfigurations.$HOST.config.system.build.sdImage" \
   --no-link --print-out-paths)"
 
 IMAGES=("$STORE_PATH"/sd-image/*)

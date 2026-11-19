@@ -13,7 +13,8 @@
       }; # end of server
       security = {
         admin_user = "aqua";
-        admin_password = "PASTE_PLAINTEXT_PASSWORD_HERE";
+        admin_password = "aquadma134!";
+        secret_key = "SW2YcwTIb9zpOOhoPsMm";
       };
       users.allow_sign_up = false;
       analytics.reporting_enabled = false;

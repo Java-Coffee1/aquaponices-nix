@@ -4,8 +4,7 @@
   imports = [
     ../../home/aqua/home.nix
     ./networking.nix
-    # ../../modules/grafana.nix disabled until agenix is wired up and the
-    # grafana-secret-key.age / grafana-oidc-secret.age files exist under ../../secrets
+    ../../modules/grafana.nix
   ];
 
   networking.hostName = "dashboard-nix-btw";

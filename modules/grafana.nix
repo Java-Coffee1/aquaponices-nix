@@ -1,9 +1,7 @@
 { ... }:
 {
-  environment.etc."grafana-dashboards".source = "/home/aqua/grafana/dashboards";
   services.grafana = {
     enable = true;
-    dataDir = "/home/aqua/grafana";
     settings = {
       server = {
         http_addr = "127.0.0.1";
@@ -20,16 +18,25 @@
       users.allow_sign_up = false;
       analytics.reporting_enabled = false;
     };
-  };
 
-  systemd.tmpfiles.settings."default"."/home/aqua/grafana".d = {
-    user = "grafana";
-    group = "grafana";
-    mode = "755";
-  };
-  systemd.tmpfiles.settings."default"."/home/aqua/grafana/dashboards".d = {
-    user = "grafana";
-    group = "grafana";
-    mode = "755";
+    provision = {
+      enable = true;
+      datasources.settings.datasources = [
+        {
+          name = "Aquaponics";
+          type = "postgres";
+          # Unix socket dir, not a host:port -- matches the Postgres role
+          # "grafana" set up in modules/postgresql.nix (peer auth, no
+          # password needed since this connects as the local grafana user).
+          url = "/run/postgresql";
+          database = "aqua";
+          user = "grafana";
+          isDefault = true;
+          jsonData = {
+            sslmode = "disable";
+          };
+        }
+      ];
+    };
   };
 }

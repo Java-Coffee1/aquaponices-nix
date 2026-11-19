@@ -5,6 +5,7 @@
     ../../home/aqua/home.nix
     ./networking.nix
     ../../modules/grafana.nix
+    ../../modules/postgresql.nix
   ];
 
   networking.hostName = "dashboard-nix-btw";
